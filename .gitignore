@@ -1,0 +1,33 @@
+# Keys and env files
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Personal trade journal and screenshots (only the example is tracked)
+journal/*.jsonl
+!journal/journal.example.jsonl
+journal/*.csv
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Local data, logs, caches
+runs/
+data/cache/
+transcripts/
+extracted/
+stats/reports/
+_to_delete/
+*.log
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+
+# Claude Code local state and build output
+.claude/settings.local.json
+.claude/skills/
+plugin/
