@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # evaluate.py и fetch_candles.py в корне проекта
 import evaluate as ev
 import fetch_candles as fc
+import i18n
 
 # Конфигурация монет бэктеста (watchlist удалён на этапе 10): этапы 7–8 и этап 9 (бывший watchlist без JCTUSDT).
 COINS = ("BTCUSDT", "ETHUSDT", "SOLUSDT", "HYPEUSDT", "ARBUSDT")
@@ -596,7 +597,7 @@ def run(days, coins, variant):
     L.append(portfolio_text("фиксированно $100", portfolio(trades, "fixed")))
     L += samples(trades)
     text = "\n".join(L)
-    (OUT / f"report_{variant}_{days}d_{stamp}.txt").write_text(text, encoding="utf-8")
+    (OUT / f"report_{variant}_{days}d_{stamp}.txt").write_text(i18n.tr(text), encoding="utf-8")
     print(text)
 
 
@@ -647,7 +648,7 @@ def stage8(coins):
         L += period_report(f"V0, {pname} период", records, trades, evaluated, skipped, coins, dates)
     L += samples(results["V0", "рабочий"][1])
     text = "\n".join(L)
-    (OUT / f"report_stage8_{stamp}.txt").write_text(text, encoding="utf-8")
+    (OUT / f"report_stage8_{stamp}.txt").write_text(i18n.tr(text), encoding="utf-8")
     print(text)
 
 
@@ -668,4 +669,5 @@ def main():
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

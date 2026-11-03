@@ -12,6 +12,8 @@
 import argparse, datetime as dt, json, os, random, sys
 from pathlib import Path
 
+import i18n
+
 FIELDS = ("id", "symbol", "strategy", "side", "kind", "sweep", "date_open", "date_close", "entry", "stop",
           "target", "rr_planned", "risk_pct", "flags", "status", "result_r", "pnl_pct", "notes")
 EXTRA = ("rules_verdict", "taken", "tags", "entry_type")
@@ -203,4 +205,5 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
+    i18n.setup()
     sys.exit(main())

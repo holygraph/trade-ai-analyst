@@ -21,20 +21,37 @@
 
    ```bash
    mkdir -p ~/trade-ai-analyst/scripts ~/trade-ai-analyst/stats
-   cp analyst.py evaluate.py fetch_candles.py journal.py ~/trade-ai-analyst/scripts/
+   cp analyst.py evaluate.py fetch_candles.py journal.py i18n.py ~/trade-ai-analyst/scripts/
    cp stats/base_rates.json ~/trade-ai-analyst/stats/
    ```
 
-2. Положите команду в личные команды Claude Code:
+2. Положите команду в личные команды Claude Code. Для русских инструкций и вывода — русскую версию под именем `analyst.md`:
 
    ```bash
    mkdir -p ~/.claude/commands
-   cp commands/analyst.md ~/.claude/commands/analyst.md
+   cp commands/analyst.ru.md ~/.claude/commands/analyst.md
    ```
 
-   Команда запускает `python "$HOME/trade-ai-analyst/scripts/analyst.py" $ARGUMENTS`.
+   Команда запускает `python "$HOME/trade-ai-analyst/scripts/analyst.py" $ARGUMENTS --lang ru`.
+   Английская версия — `commands/analyst.md`, её копируют так же: `cp commands/analyst.md ~/.claude/commands/analyst.md`.
 
-Другой вариант: откройте эту папку в Claude Code. Проектная команда `.claude/commands/analyst.md` запускает `python analyst.py` из корня репозитория.
+Другой вариант: откройте эту папку в Claude Code. Проектная команда `.claude/commands/analyst.md` запускает `python analyst.py` из корня репозитория
+(английский вывод); русский вариант `.claude/commands/analyst.ru.md` доступен там как `/analyst.ru`.
+
+## Язык вывода
+
+По умолчанию вывод на английском. Русский включается параметром `--lang ru` или переменной окружения `ANALYST_LANG`.
+Приоритет: `--lang`, затем `ANALYST_LANG`, затем `en`.
+
+```bash
+python analyst.py BTCUSDT long --lang ru
+ANALYST_LANG=ru python analyst.py BTCUSDT long
+ANALYST_LANG=ru python analyst.py BTCUSDT long --lang en   # --lang важнее: английский
+```
+
+В Claude Code: `/analyst BTCUSDT long --lang ru`. Тот же параметр работает для `evaluate.py`, `fetch_candles.py`, `journal.py`,
+`build_plugin.py` и скриптов в `research/`. Все переводы — в `i18n.py`.
+Сохраняемые значения не переводятся: поля журнала (например `--kind продолжение|коррекция`) и ключи в `stats/base_rates.json`.
 
 ## Использование
 
@@ -64,6 +81,8 @@ python analyst.py BTCUSDT long 100000 98000 104000
 | `evaluate.py` | Условия стратегий и статусы |
 | `fetch_candles.py` | Свечи Bybit, уровни, стоп, цель, R:R |
 | `journal.py` | Необязательный журнал (`add`, `close`, `cancel`, `stats`), пишет только по просьбе |
+| `i18n.py` | Язык вывода (`--lang`, `ANALYST_LANG`) и английские переводы |
+| `commands/analyst.md`, `commands/analyst.ru.md` | Команда `/analyst` для `~/.claude/commands/` (английская / русская) |
 | `journal/README.md` | Схема журнала |
 | `journal/journal.example.jsonl` | Пример журнала с вымышленными данными |
 | `stats/base_rates.json` | Частоты по истории из бэктеста |
@@ -72,7 +91,7 @@ python analyst.py BTCUSDT long 100000 98000 104000
 | `test_*.py` | Тесты, запускаются как обычные скрипты, например `python test_journal.py` |
 
 Журнал хранится в `$TRADE_ANALYST_HOME/journal/journal.jsonl` (по умолчанию `~/trade-ai-analyst`), вне репозитория, и игнорируется git.
-Единственная настройка описана в `.env.example`.
+Настройки: `TRADE_ANALYST_HOME` (см. `.env.example`) и `ANALYST_LANG`.
 
 ## Настройка правил
 

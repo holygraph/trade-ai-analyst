@@ -13,6 +13,7 @@ import backtest as bt
 import evaluate as ev
 import fetch_candles as fc
 import stage9 as s9
+import i18n
 
 LEVELS = (0.5, 1, 1.5, 2, 3)
 FLAGS = (("стоп близко", "стоп ближе"), ("FTA < 1R", "FTA < 1R"), ("против BTC", ", против"),
@@ -95,4 +96,5 @@ def main():
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

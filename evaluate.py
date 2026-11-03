@@ -16,6 +16,7 @@ import calendar, datetime as dt, json, sys, time
 from pathlib import Path
 
 import fetch_candles as fc
+import i18n
 
 PASS, FAIL, UNKNOWN, NA = "pass", "fail", "unknown", "не применимо"
 READY, NO, ALMOST, UNCHECKED = "ГОТОВ", "НЕТ", "НЕТ-ПОЧТИ", "НЕ ПРОВЕРЕНО"
@@ -985,7 +986,7 @@ def main():
     show = bool(args) and args[0] == "--cards"
     symbols = [a.upper() for a in args if not a.startswith("--")]
     if not symbols:
-        print(__doc__)              # списка монет по умолчанию нет: только явные тикеры
+        print(i18n.block("evaluate_usage", __doc__))    # списка монет по умолчанию нет: только явные тикеры
         return
     all_rows, lines = [], []
     for s in symbols:
@@ -1016,4 +1017,5 @@ def main():
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

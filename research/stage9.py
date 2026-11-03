@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import backtest as bt
 import evaluate as ev
 import fetch_candles as fc
+import i18n
 
 START, END = "2022-11-02", "2026-11-01"
 YEARS = (("2022-11-02", "2023-11-01"), ("2023-11-02", "2024-11-01"),
@@ -416,9 +417,10 @@ def main():
                 f"срезы с Bonferroni, золото, диагностика). Результаты, не прошедшие правило решений, нельзя считать "
                 f"подтверждением; при таком числе сравнений часть «хороших» срезов ожидаема случайно.")
     text = "\n".join(L)
-    (bt.OUT / f"report_stage9_{stamp}.txt").write_text(text, encoding="utf-8")
+    (bt.OUT / f"report_stage9_{stamp}.txt").write_text(i18n.tr(text), encoding="utf-8")
     print(text)
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

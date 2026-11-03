@@ -8,7 +8,6 @@ and prints statuses, levels and R:R. The model only relays the script's output; 
 > `stats/base_rates.json` come from a backtest and are not a forecast. Trade at your own risk.
 
 What it does not do: it does not scan coin lists, run on a schedule, place orders, or ask for API keys.
-Output text is in Russian.
 
 ## Requirements
 
@@ -22,7 +21,7 @@ Output text is in Russian.
 
    ```bash
    mkdir -p ~/trade-ai-analyst/scripts ~/trade-ai-analyst/stats
-   cp analyst.py evaluate.py fetch_candles.py journal.py ~/trade-ai-analyst/scripts/
+   cp analyst.py evaluate.py fetch_candles.py journal.py i18n.py ~/trade-ai-analyst/scripts/
    cp stats/base_rates.json ~/trade-ai-analyst/stats/
    ```
 
@@ -34,8 +33,29 @@ Output text is in Russian.
    ```
 
    It runs `python "$HOME/trade-ai-analyst/scripts/analyst.py" $ARGUMENTS`.
+   For Russian instructions and output, copy `commands/analyst.ru.md` instead, under the same name:
 
-Alternatively, open this folder in Claude Code: the project-level command `.claude/commands/analyst.md` runs `python analyst.py` from the repo root.
+   ```bash
+   cp commands/analyst.ru.md ~/.claude/commands/analyst.md
+   ```
+
+Alternatively, open this folder in Claude Code: the project-level command `.claude/commands/analyst.md` runs `python analyst.py` from the repo root
+(`.claude/commands/analyst.ru.md` is the Russian variant, available there as `/analyst.ru`).
+
+## Output language
+
+Output is in English by default. Russian is available with `--lang ru` or the `ANALYST_LANG` environment variable.
+Priority: `--lang`, then `ANALYST_LANG`, then `en`.
+
+```bash
+python analyst.py BTCUSDT long --lang ru
+ANALYST_LANG=ru python analyst.py BTCUSDT long
+ANALYST_LANG=ru python analyst.py BTCUSDT long --lang en   # --lang wins: English
+```
+
+In Claude Code: `/analyst BTCUSDT long --lang ru`. The same option works for `evaluate.py`, `fetch_candles.py`, `journal.py`,
+`build_plugin.py` and the scripts in `research/`. All translations are in `i18n.py`.
+Stored values stay as they are: journal fields (for example `--kind продолжение|коррекция`) and the keys in `stats/base_rates.json`.
 
 ## Usage
 
@@ -65,6 +85,8 @@ Without a side, both sides are shown, one line each.
 | `evaluate.py` | Strategy conditions and statuses |
 | `fetch_candles.py` | Bybit public candles, levels, stop/target/R:R |
 | `journal.py` | Optional trade journal (`add`, `close`, `cancel`, `stats`); writes only when you ask |
+| `i18n.py` | Output language (`--lang`, `ANALYST_LANG`) and the English translations |
+| `commands/analyst.md`, `commands/analyst.ru.md` | `/analyst` command for `~/.claude/commands/` (English / Russian) |
 | `journal/README.md` | Journal schema (Russian) |
 | `journal/journal.example.jsonl` | Fictional journal example |
 | `stats/base_rates.json` | Historical frequencies from the backtest |
@@ -73,7 +95,7 @@ Without a side, both sides are shown, one line each.
 | `test_*.py` | Tests, run as plain scripts, e.g. `python test_journal.py` |
 
 The journal lives in `$TRADE_ANALYST_HOME/journal/journal.jsonl` (default `~/trade-ai-analyst`), outside the repo, and is ignored by git.
-See `.env.example` for the only setting.
+Settings: `TRADE_ANALYST_HOME` (see `.env.example`) and `ANALYST_LANG`.
 
 ## Customising the rules
 

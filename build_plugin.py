@@ -9,13 +9,14 @@
 import json, shutil
 from pathlib import Path
 
+import i18n
 import journal as jr
 
 ROOT = Path(__file__).resolve().parent
 MARKET = ROOT / "plugin"
 PLUGIN = MARKET / "trade-ai-analyst"
 VERSION = "1.0.0"
-SCRIPTS = ("analyst.py", "evaluate.py", "fetch_candles.py", "journal.py")
+SCRIPTS = ("analyst.py", "evaluate.py", "fetch_candles.py", "journal.py", "i18n.py")
 README = """# trade-ai-analyst
 Личный плагин Claude Code: аналитик одной сделки по правилам пользователя, по запросу, без сканирования списка монет.
 Команда: `/trade-ai-analyst:analyst ТИКЕР long|short [вход] [стоп] [тейк1 тейк2 ...]`. Данные — публичный API Bybit
@@ -59,16 +60,18 @@ def main():
     (MARKET / ".claude-plugin").mkdir(parents=True, exist_ok=True)
     (PLUGIN / ".claude-plugin" / "plugin.json").write_text(json.dumps(dict(
         name="trade-ai-analyst", version=VERSION, author=dict(name="trade-ai-analyst"),
-        description="Аналитик сделок по правилам пользователя: /trade-ai-analyst:analyst ТИКЕР long|short [вход] [стоп] [тейки]"),
+        description=i18n.block("plugin_description",
+                               "Аналитик сделок по правилам пользователя: /trade-ai-analyst:analyst ТИКЕР long|short [вход] [стоп] [тейки]")),
         ensure_ascii=False, indent=2), encoding="utf-8")
     (MARKET / ".claude-plugin" / "marketplace.json").write_text(json.dumps(dict(
         name="trade-ai-analyst-local", owner=dict(name="trade-ai-analyst"),
-        description="Личный локальный маркетплейс: плагин trade-ai-analyst, без публикации",
-        plugins=[dict(name="trade-ai-analyst", source="./trade-ai-analyst", description="Аналитик сделок по правилам пользователя")]),
+        description=i18n.block("market_description", "Личный локальный маркетплейс: плагин trade-ai-analyst, без публикации"),
+        plugins=[dict(name="trade-ai-analyst", source="./trade-ai-analyst",
+                      description=i18n.block("market_plugin_description", "Аналитик сделок по правилам пользователя"))]),
         ensure_ascii=False, indent=2), encoding="utf-8")
-    (PLUGIN / "README.md").write_text(README, encoding="utf-8")
+    (PLUGIN / "README.md").write_text(i18n.block("plugin_readme", README), encoding="utf-8")
     (PLUGIN / "commands").mkdir()
-    (PLUGIN / "commands" / "analyst.md").write_text(COMMAND, encoding="utf-8")
+    (PLUGIN / "commands" / "analyst.md").write_text(i18n.block("plugin_command", COMMAND), encoding="utf-8")
     shutil.copytree(ROOT / ".claude" / "skills" / "trading-analyst", PLUGIN / "skills" / "trading-analyst",
                     ignore=shutil.ignore_patterns("_template.md"))
     (PLUGIN / "scripts").mkdir()
@@ -91,4 +94,5 @@ def main():
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

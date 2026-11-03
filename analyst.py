@@ -9,6 +9,7 @@ from pathlib import Path
 
 import evaluate as ev
 import fetch_candles as fc
+import i18n
 import journal as jr
 
 FEES = (0.0002, 0.00055, 0.0002)        # maker, taker, проскальзывание стопа
@@ -435,11 +436,12 @@ def both_sides(u, rows, price, stamp, cat):
 
 
 def fit(lines, limit=OUTPUT_LIMIT):
-    """Не длиннее limit символов: сначала убираются справочные строки, затем строки обрезаются."""
+    """Не длиннее limit символов на языке вывода: сначала убираются справочные строки, затем строки обрезаются."""
+    lines = [i18n.tr(x) for x in lines]
     text = "\n".join(lines)
     if len(text) <= limit:
         return text
-    lines = [x for x in lines if not x.startswith("Справочно")]
+    lines = [x for x in lines if not x.startswith(i18n.tr("Справочно"))]
     text = "\n".join(lines)
     if len(text) <= limit:
         return text
@@ -487,4 +489,5 @@ def main():
 
 
 if __name__ == "__main__":
+    i18n.setup()
     main()

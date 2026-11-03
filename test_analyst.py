@@ -205,4 +205,51 @@ assert both.split("\n")[1].startswith("LONG: ") and both.split("\n")[2].startswi
 long_lines = ["шапка"] + ["x" * 200] * 20 + ["Справочно, вне правил: " + "y" * 100, "Проверка правил, не рекомендация; проверь экономический календарь."]
 cut = an.fit(long_lines)
 assert len(cut) <= an.OUTPUT_LIMIT and cut.endswith("календарь.") and "Справочно" not in cut
+
+# язык вывода: en по умолчанию, ru без изменений, --lang важнее ANALYST_LANG
+import ast, re
+import i18n
+
+CYR = re.compile(r"[А-Яа-яЁё]")
+argv = ["analyst.py", "BTCUSDT", "--lang", "ru", "long"]
+assert i18n.pick(argv, {}) == "ru" and argv == ["analyst.py", "BTCUSDT", "long"]
+assert i18n.pick(["a", "--lang=en"], {"ANALYST_LANG": "ru"}) == "en"
+assert i18n.pick(["a"], {"ANALYST_LANG": "ru"}) == "ru" and i18n.pick(["a"], {}) == "en"
+try:
+    i18n.pick(["a", "--lang", "de"], {})
+    raise AssertionError("de")
+except SystemExit:
+    pass
+outputs = [an.report(dict(symbol="TESTUSDT", side=side, entry=price, stop=price * (0.98 if side == "up" else 1.02),
+                          takes=[price * (1.03 if side == "up" else 0.97)]), rows, cc, price, "2025-02-14 00:00",
+                     "linear:Trading", [], rates, asof) for side in ("up", "down")]
+outputs += [both, ev.one_line("TESTUSDT", rows, "2025-02-14 00:00")] + [ev.card("TESTUSDT", r) for r in rows]
+outputs += [parse_error(a) for a in ([], ["BTCUSDT", "100"], ["BTCUSDT", "long", "100", "101"], ["BTCUSDT", "short", "100", "99"],
+                                     ["BTCUSDT", "long", "100", "98", "104", "99"], ["BTC/USDT", "long"])]
+for text in outputs:
+    assert i18n.tr(text, "ru") == text
+    en = i18n.tr(text, "en")
+    assert not CYR.search(en), [x for x in en.split("\n") if CYR.search(x)]
+i18n.LANG = "en"                        # как после setup(): лимит 2500 считается по английскому тексту
+for side in ("up", "down"):
+    out = an.report(dict(symbol="TESTUSDT", side=side, entry=price, stop=price * (0.98 if side == "up" else 1.02),
+                         takes=[price * (1.03 if side == "up" else 0.97)]), rows, cc, price, "2025-02-14 00:00",
+                    "linear:Trading", [], rates, asof)
+    assert not CYR.search(out) and len(out) <= an.OUTPUT_LIMIT, len(out)
+    assert out.split("\n")[-1] == "Rules check, not financial advice; check the economic calendar.", out
+cut = an.fit(long_lines)
+assert len(cut) <= an.OUTPUT_LIMIT and cut.endswith("calendar.") and "For reference" not in cut
+i18n.LANG = None
+# каждый русский фрагмент строк вывода переводится (кроме частей слов, которые переводятся целой фразой)
+PARTS = {" уровн", "я", "ем"}
+root = Path(__file__).resolve().parent
+for name in ("analyst.py", "evaluate.py", "fetch_candles.py", "journal.py",
+             "research/backtest.py", "research/stage9.py", "research/base_rates.py"):
+    tree = ast.parse((root / name).read_text(encoding="utf-8"))
+    docs = {id(n.body[0].value) for n in ast.walk(tree) if isinstance(n, (ast.Module, ast.FunctionDef, ast.ClassDef))
+            and n.body and isinstance(n.body[0], ast.Expr) and isinstance(n.body[0].value, ast.Constant)}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Constant) and isinstance(n.value, str) and id(n) not in docs and n.value not in PARTS:
+            assert not CYR.search(i18n.tr(n.value, "en")), (name, n.lineno, n.value)
+assert not CYR.search(i18n.tr("до уровня отмены 5; за уровнем отмены 6", "en"))
 print("OK")

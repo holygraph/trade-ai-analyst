@@ -11,6 +11,8 @@ from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+import i18n
+
 ROOT = Path(__file__).parent
 API = "https://api.bybit.com/v5/market/"
 LIMIT = 300
@@ -582,7 +584,7 @@ def setup(symbol, tf, side, lo, hi, stop_tf=None):
 def main():
     args = sys.argv[1:]
     if not args or args == ["--check"]:
-        print(__doc__)
+        print(i18n.block("fetch_candles_usage", __doc__))
         return
     if args[0] == "--check":
         check(args[1:])
@@ -598,4 +600,5 @@ def main():
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
+    i18n.setup()
     main()
